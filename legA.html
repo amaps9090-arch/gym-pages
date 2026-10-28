@@ -18,11 +18,11 @@ ul{margin:4px 0;padding-left:20px}.you{background:#fff4e5;border-left:4px solid 
 .set.done{background:#e9f9ee}.sn{font-weight:700;width:100%;display:flex;justify-content:space-between}
 .stp{display:flex;align-items:center;gap:4px}.stp label{font-size:12px;color:#636366;width:100%}
 .stpw{display:flex;flex-direction:column}
-.stp button{width:46px;height:46px;font-size:24px;border:0;border-radius:10px;background:#e5e5ea}
+.stp button{width:46px;height:46px;font-size:24px;border:0;border-radius:10px;background:#e5e5ea;touch-action:manipulation;-webkit-user-select:none;user-select:none}
 .stp input{width:64px;height:46px;text-align:center;font-size:20px;border:1px solid #d1d1d6;border-radius:8px}
-.rir{display:flex;gap:4px}.rir button{min-width:44px;height:40px;border:1px solid #d1d1d6;background:#fff;border-radius:8px;font-size:15px}
+.rir{display:flex;gap:4px}.rir button{min-width:44px;height:40px;border:1px solid #d1d1d6;background:#fff;border-radius:8px;font-size:15px;touch-action:manipulation;-webkit-user-select:none;user-select:none}
 .rir button.on{background:#0a84ff;color:#fff;border-color:#0a84ff}
-.donebtn{flex:1;min-width:120px;height:46px;border:0;border-radius:10px;background:#d1d1d6;font-size:17px}
+.donebtn{flex:1;min-width:120px;height:46px;border:0;border-radius:10px;background:#d1d1d6;font-size:17px;touch-action:manipulation}
 .done .donebtn{background:#30d158;color:#fff}
 .row{display:flex;gap:8px;margin-top:8px}.row button{flex:1;height:42px;border:0;border-radius:10px;background:#e5e5ea;font-size:15px}
 .expl{font-size:12px;color:#8e8e93;width:100%}
@@ -68,28 +68,65 @@ if(D.hist.length){let h=`<div class="card hist"><h2>📈 历史记录</h2>`;
  $("#hist").innerHTML=h+"</div>"}
 // cards
 const RT=["力竭","还能1","还能2","还能3","还能4"];
-function stepper(lbl,val,i,j,f,step){return `<div class="stpw"><label class="stp">${lbl}</label><div class="stp"><button data-a="s" data-i="${i}" data-j="${j}" data-f="${f}" data-s="${-step}">−</button><input inputmode="decimal" value="${val}" data-a="v" data-i="${i}" data-j="${j}" data-f="${f}"><button data-a="s" data-i="${i}" data-j="${j}" data-f="${f}" data-s="${step}">＋</button></div></div>`}
-function setHTML(e,i,s,j){let h=`<div class="set ${s.done?"done":""}"><div class="sn"><span>第 ${j+1} 组</span></div>`;
+function stepper(lbl,val,i,j,f,step){return `<div class="stpw"><label class="stp">${lbl}</label><div class="stp"><button type="button" data-a="s" data-i="${i}" data-j="${j}" data-f="${f}" data-s="${-step}">−</button><input inputmode="decimal" readonly value="${val}" data-a="v" data-i="${i}" data-j="${j}" data-f="${f}"><button type="button" data-a="s" data-i="${i}" data-j="${j}" data-f="${f}" data-s="${step}">＋</button></div></div>`}
+function setHTML(e,i,s,j){let h=`<div class="set ${s.done?"done":""}" data-set="${i}-${j}"><div class="sn"><span>第 ${j+1} 组</span></div>`;
  if(e.kind=="cardio"){h+=stepper("分钟",s.min,i,j,"min",5)+stepper("平均心率",s.hr,i,j,"hr",5)+stepper("坡度",s.inc,i,j,"inc",1)+stepper("阻力",s.res,i,j,"res",1)}
  else{ if(e.unit)h+=stepper(e.kind=="farmer"?"每只手 kg":"重量 kg",s.w,i,j,"w",e.step);
   if(e.side)h+=stepper(e.kind=="farmer"?"左 米":"左 次数",s.rL,i,j,"rL",e.kind=="farmer"?10:1)+stepper(e.kind=="farmer"?"右 米":"右 次数",s.rR,i,j,"rR",e.kind=="farmer"?10:1);else h+=stepper(e.kind=="farmer"?"米":e.kind=="time"?"秒":"次数",s.r,i,j,"r",e.kind=="farmer"?10:e.kind=="time"?5:1);
-  if(e.kind=="w")h+=`<div style="width:100%"><label class="stp">还能做几次</label><div class="rir">${RT.map((t,k)=>`<button class="${s.rir==k?"on":""}" data-a="rir" data-i="${i}" data-j="${j}" data-k="${k}">${k==0?"0 力竭":k}</button>`).join("")}</div><div class="expl">这组做完，感觉还能再做几次？0 = 一次也推不动了（力竭）。大多数组留 2–3 次。</div></div>`}
- return h+`<button class="donebtn" data-a="d" data-i="${i}" data-j="${j}">${s.done?"✅ 已完成":"点我 完成这组"}</button></div>`}
+  if(e.kind=="w")h+=`<div style="width:100%"><label class="stp">还能做几次</label><div class="rir">${RT.map((t,k)=>`<button type="button" class="${s.rir==k?"on":""}" data-a="rir" data-i="${i}" data-j="${j}" data-k="${k}">${k==0?"0 力竭":k}</button>`).join("")}</div><div class="expl">这组做完，感觉还能再做几次？0 = 一次也推不动了（力竭）。大多数组留 2–3 次。</div></div>`}
+ return h+`<button type="button" class="donebtn" data-a="d" data-i="${i}" data-j="${j}">${s.done?"✅ 已完成":"点我 完成这组"}</button></div>`}
 function tgt(e){if(e.kind=="cardio")return "30–40 分钟 · 阻力 8–10（有发力感）· 坡度 1–3 · 心率 150–165";const s=e.sets[0];
  return e.sets.length+" 组 × "+(e.kind=="farmer"?s[1]+" 米 @ "+s[0]+"kg"+(e.side?"（每侧换手）":" 双手"):e.kind=="time"?s[1]+" 秒":s[1]+" 次"+(e.unit?" @ "+s[0]+"kg":""))}
-function render(){$("#list").innerHTML=D.exs.map((e,i)=>`<div class="card"><h2>${i+1}. ${esc(e.name)}</h2><div class="tgt">目标：${tgt(e)}${e.side?"（每侧，左右分开记）":""}</div>
+function setsBlock(i){return st.ex[i].map((s,j)=>setHTML(D.exs[i],i,s,j)).join("")}
+function renderEx(i){const box=document.querySelector(`[data-ex="${i}"] .sets`);if(box){box.innerHTML=setsBlock(i);save();return true}return false}
+function render(){$("#list").innerHTML=D.exs.map((e,i)=>`<div class="card" data-ex="${i}"><h2>${i+1}. ${esc(e.name)}</h2><div class="tgt">目标：${tgt(e)}${e.side?"（每侧，左右分开记）":""}</div>
  ${e.gif?`<img class="gif" loading="lazy" alt="${esc(e.name)}" src="${D.gifs[e.gif]}"><div class="cap">© Gym visual${e.gifnote?" · "+esc(e.gifnote):""}</div>`:`<div class="cap">（动作库里没有合适的动图，看下面要点）</div>`}
  <div class="kv"><b>练哪里：</b>${esc(e.where)}</div><div class="kv"><b>哪里该有感觉：</b>${esc(e.feel)}</div>
  <ul>${e.cues.map(c=>`<li>${esc(c)}</li>`).join("")}</ul><div class="you"><b>针对你：</b>${esc(e.you)}</div><div class="ev">📚 ${esc(e.ev)}</div>
- ${st.ex[i].map((s,j)=>setHTML(e,i,s,j)).join("")}
- <div class="row"><button data-a="add" data-i="${i}">＋ 加一组</button><button data-a="rm" data-i="${i}">− 删最后一组</button></div></div>`).join("");save()}
-document.addEventListener("click",ev=>{const b=ev.target.closest("[data-a]");if(!b||b.tagName=="INPUT")return;ev.preventDefault();const i=+b.dataset.i,j=+b.dataset.j,a=b.dataset.a,L=st.ex[i];
- if(a=="s"){const f=b.dataset.f;L[j][f]=Math.max(0,Math.round((+L[j][f]+ +b.dataset.s)*10)/10);const inp=b.parentElement&&b.parentElement.querySelector("input");if(inp)inp.value=L[j][f];save();return}
- else if(a=="rir")L[j].rir=+b.dataset.k;else if(a=="d")L[j].done=!L[j].done;
- else if(a=="add")L.push(Object.assign({},L[L.length-1],{done:false}));else if(a=="rm"&&L.length>1)L.pop();
- const y=window.scrollY||document.documentElement.scrollTop||0;render();
+ <div class="sets">${setsBlock(i)}</div>
+ <div class="row"><button type="button" data-a="add" data-i="${i}">＋ 加一组</button><button type="button" data-a="rm" data-i="${i}">− 删最后一组</button></div></div>`).join("");save()}
+// 阻止 iOS 点 +/- 时旁边 input 抢焦点导致页面下滑
+document.addEventListener("pointerdown",ev=>{
+ const b=ev.target.closest("button[data-a]");
+ if(!b)return;
+ if(b.dataset.a==="s"||b.dataset.a==="rir"||b.dataset.a==="d")ev.preventDefault();
+},{passive:false});
+document.addEventListener("click",ev=>{
+ const b=ev.target.closest("[data-a]");
+ if(!b||b.tagName==="INPUT")return;
+ ev.preventDefault();
+ const i=+b.dataset.i,j=+b.dataset.j,a=b.dataset.a,L=st.ex[i];
+ if(a==="s"){
+  const f=b.dataset.f;
+  L[j][f]=Math.max(0,Math.round((+L[j][f]+ +b.dataset.s)*10)/10);
+  const inp=b.parentElement&&b.parentElement.querySelector("input");
+  if(inp)inp.value=L[j][f];
+  save();return;
+ }
+ if(a==="rir"){
+  L[j].rir=+b.dataset.k;
+  const box=b.closest(".rir");
+  if(box)box.querySelectorAll("button").forEach(x=>x.classList.toggle("on",+x.dataset.k===L[j].rir));
+  save();return;
+ }
+ if(a==="d"){
+  L[j].done=!L[j].done;
+  const set=b.closest(".set");
+  if(set){set.classList.toggle("done",L[j].done);b.textContent=L[j].done?"✅ 已完成":"点我 完成这组"}
+  save();return;
+ }
+ if(a==="add")L.push(Object.assign({},L[L.length-1],{done:false}));
+ else if(a==="rm"&&L.length>1)L.pop();
+ else return;
+ // 加减组：只重绘该动作的组列表，保持滚动
+ const y=window.scrollY||document.documentElement.scrollTop||0;
+ if(!renderEx(i))render();
  const lock=()=>{window.scrollTo(0,y);document.documentElement.scrollTop=y;document.body.scrollTop=y};
- lock();requestAnimationFrame(()=>{lock();requestAnimationFrame(lock)})});
+ lock();requestAnimationFrame(()=>{lock();requestAnimationFrame(lock)});
+});
+// 点输入框才可编辑；失焦恢复 readonly，避免误触焦点下滑
+document.addEventListener("focusin",ev=>{const t=ev.target;if(t.dataset&&t.dataset.a==="v"){t.removeAttribute("readonly")}});
+document.addEventListener("focusout",ev=>{const t=ev.target;if(t.dataset&&t.dataset.a==="v"){t.setAttribute("readonly","");const v=parseFloat(t.value);st.ex[+t.dataset.i][+t.dataset.j][t.dataset.f]=isNaN(v)?0:v;save()}});
 document.addEventListener("change",ev=>{const t=ev.target;if(t.dataset.a=="v"){const v=parseFloat(t.value);st.ex[+t.dataset.i][+t.dataset.j][t.dataset.f]=isNaN(v)?0:v;save()}});
 $("#date").value=st.date;$("#date").onchange=e=>{st.date=e.target.value;save()};
 $("#note").value=st.note;$("#note").oninput=e=>{st.note=e.target.value;save()};
