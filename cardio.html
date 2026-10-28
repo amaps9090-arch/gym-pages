@@ -83,11 +83,13 @@ function render(){$("#list").innerHTML=D.exs.map((e,i)=>`<div class="card"><h2>$
  <ul>${e.cues.map(c=>`<li>${esc(c)}</li>`).join("")}</ul><div class="you"><b>针对你：</b>${esc(e.you)}</div><div class="ev">📚 ${esc(e.ev)}</div>
  ${st.ex[i].map((s,j)=>setHTML(e,i,s,j)).join("")}
  <div class="row"><button data-a="add" data-i="${i}">＋ 加一组</button><button data-a="rm" data-i="${i}">− 删最后一组</button></div></div>`).join("");save()}
-document.addEventListener("click",ev=>{const b=ev.target.closest("[data-a]");if(!b||b.tagName=="INPUT")return;const i=+b.dataset.i,j=+b.dataset.j,a=b.dataset.a,L=st.ex[i];
- if(a=="s"){const f=b.dataset.f;L[j][f]=Math.max(0,Math.round((+L[j][f]+ +b.dataset.s)*10)/10)}
+document.addEventListener("click",ev=>{const b=ev.target.closest("[data-a]");if(!b||b.tagName=="INPUT")return;ev.preventDefault();const i=+b.dataset.i,j=+b.dataset.j,a=b.dataset.a,L=st.ex[i];
+ if(a=="s"){const f=b.dataset.f;L[j][f]=Math.max(0,Math.round((+L[j][f]+ +b.dataset.s)*10)/10);const inp=b.parentElement&&b.parentElement.querySelector("input");if(inp)inp.value=L[j][f];save();return}
  else if(a=="rir")L[j].rir=+b.dataset.k;else if(a=="d")L[j].done=!L[j].done;
  else if(a=="add")L.push(Object.assign({},L[L.length-1],{done:false}));else if(a=="rm"&&L.length>1)L.pop();
- const y=window.scrollY;render();window.scrollTo(0,y)});
+ const y=window.scrollY||document.documentElement.scrollTop||0;render();
+ const lock=()=>{window.scrollTo(0,y);document.documentElement.scrollTop=y;document.body.scrollTop=y};
+ lock();requestAnimationFrame(()=>{lock();requestAnimationFrame(lock)})});
 document.addEventListener("change",ev=>{const t=ev.target;if(t.dataset.a=="v"){const v=parseFloat(t.value);st.ex[+t.dataset.i][+t.dataset.j][t.dataset.f]=isNaN(v)?0:v;save()}});
 $("#date").value=st.date;$("#date").onchange=e=>{st.date=e.target.value;save()};
 $("#note").value=st.note;$("#note").oninput=e=>{st.note=e.target.value;save()};
