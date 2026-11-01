@@ -46,7 +46,7 @@ const K="gym-"+D.key, $=s=>document.querySelector(s), esc=s=>String(s).replace(/
 const today=()=>{const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")};
 function fresh(){return{date:today(),note:"",ex:D.exs.map(e=>e.kind=="cardio"?[{min:e.sets[0][1],hr:155,inc:2,res:9,done:false}]:e.sets.map(([w,r])=>e.side?{w,rL:r,rR:r,rir:2,done:false}:{w,r,rir:2,done:false}))}}
 let st;try{st=JSON.parse(localStorage.getItem(K))}catch(e){}
-if(!st||!st.ex||st.ex.length!=D.exs.length)st=fresh();
+if(!st||!st.ex||st.ex.length!=D.exs.length||st.date!==today())st=fresh();
 D.exs.forEach((e,i)=>{if(e.side&&st.ex[i][0]&&st.ex[i][0].rL===undefined)st.ex[i]=fresh().ex[i]});
 const save=()=>{try{localStorage.setItem(K,JSON.stringify(st))}catch(e){};$("#out").value=text()};
 // header
